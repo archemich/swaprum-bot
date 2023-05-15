@@ -1,1 +1,1 @@
-# swaprum-claim-bot
+# swaprum
