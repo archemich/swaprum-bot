@@ -12,7 +12,7 @@ from selenium.webdriver.chrome.options import Options
 
 from .types import MetaMask
 from .telegram import Telegram
-
+from .version import __version__
 
 def parse_csv(csv_p: Path) -> List[MetaMask]:
     """
@@ -33,6 +33,7 @@ def log_exception(e: Exception):
 
 def parse_args():
     parser = argparse.ArgumentParser()
+    parser.add_argument('--version', action='version', version=__version__)
     parser.add_argument('--chrome-webdriver', type=Path, required=True,
                         help='Path to chrome webdriver.')
     parser.add_argument('--csv-wallets', type=Path, required=True,
@@ -51,6 +52,7 @@ def setup_driver() -> webdriver.Chrome:
     options.add_extension(str(third_parties_path / 'antizapret.crx'))
     driver = webdriver.Chrome(options=options)
     return driver
+
 
 def main():
     args = parse_args()

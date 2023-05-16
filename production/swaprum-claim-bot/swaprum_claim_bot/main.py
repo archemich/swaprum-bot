@@ -7,6 +7,8 @@ from typing import List
 
 import requests
 
+from .version import __version__
+
 def parse_csv(csv_p: Path) -> List[str]:
     """
     Parse csv and get list of wallet addresses.
@@ -23,6 +25,7 @@ def log_exception(e: Exception):
     traceback.print_exception(e)
 def parse_args():
     parser = argparse.ArgumentParser()
+    parser.add_argument('--version', action='version', version=__version__)
     parser.add_argument('--csv-wallets', type=Path, required=True,
                         help='.csv file where stored wallet addresses '
                              'in the second column')
