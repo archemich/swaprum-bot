@@ -1,34 +1,49 @@
 import shutil
 import time
-from operator import attrgetter
 from pathlib import Path
+from enum import Enum, auto
 
 import psutil
 import pywinauto as pwa
 
 
 class Telegram():
+    class TelegramUser(Enum):
+        User = auto()
+        Bot = auto()
+        Group = auto()
+
     proc_name: str = 'telegram_bot.exe'
 
     def __init__(self, base_tg_exe: Path, target_tg_dir:Path):
         self.tg_p = target_tg_dir / self.proc_name
         shutil.copyfile(base_tg_exe, target_tg_dir / self.proc_name)
-        # sp.Popen(self.tg_p)
         self.app = pwa.Application(backend='uia')
         self.app = self.app.start(str(self.tg_p))
         self.app.Dialog.wait('ready')
         self.app.Dialog.maximize()
         self.dlg = self.app.Dialog
 
-    def search_user(self, text, is_user_bot: bool = True):
+    def search_user(self, text, user_type: TelegramUser):
         edit = self.dlg.Edit
         edit.set_focus()
         pwa.keyboard.send_keys(text + '{ENTER}')
         time.sleep(3)
         pwa.keyboard.send_keys('{ENTER}')
-        if is_user_bot:
+        time.sleep(1)
+        pwa.keyboard.send_keys('{ENTER}{ENTER}{ENTER}')
+        time.sleep(1)
+        pwa.keyboard.send_keys('{TAB}')
+
+        if user_type == Telegram.TelegramUser.Bot:
             time.sleep(3)
             pwa.keyboard.send_keys('{ENTER}')
+        elif user_type == Telegram.TelegramUser.Group:
+            # join group
+            rect = self.dlg.rectangle()
+            center_rect = ((rect.right - rect.left) // 2 + rect.left, rect.bottom - 2)
+            pwa.mouse.click(coords=center_rect)
+
 
     def send_message(self, text: str):
         text=text.replace(' ', '{SPACE}')
